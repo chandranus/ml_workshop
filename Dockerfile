@@ -1,16 +1,25 @@
-# Use an official Python runtime as a parent image
+
 FROM python:3.9-slim
 
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# ✅ FIX: install C compiler + build tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    build-essential \
+    libev-dev \
+    libffi-dev \
+    python3-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY . /app
 
-# Install necessary dependencies
+# upgrade pip first (important for ML packages)
+RUN pip install --upgrade pip
+
 RUN pip install -e .[serve]
 
-EXPOSE 8000
+EXPOSE 5000 8000
 
-
-# Step 7: Define the command to run the FastAPI app with Uvicorn
-CMD ["python", "workshop/inference/app.py", "repo_id", "Qishuai/ml_workshop_sample"]
+CMD ["bash"]
